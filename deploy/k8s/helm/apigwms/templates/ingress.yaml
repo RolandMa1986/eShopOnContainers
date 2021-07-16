@@ -1,7 +1,11 @@
 {{- if .Values.ingress.enabled -}}
 {{- $ingressPath := include "pathBase" . -}}
 {{- $serviceName := .Values.app.svc.mobileshoppingapigw -}}
-
+{{- $ingressClass := get .Values.ingress.annotations "kubernetes.io/ingress.class" -}}
+{{- if eq $ingressClass "nginx" -}}
+  {{- $_ := set .Values.ingress.annotations "nginx.ingress.kubernetes.io/rewrite-target" "/$2" -}}
+  {{- $ingressPath  = printf "%s%s" $ingressPath  "(/|$)(.*)" -}}
+{{- end }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
